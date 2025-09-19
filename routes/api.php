@@ -13,13 +13,13 @@ Route::get('/user', function (Request $request) {
 
 Route::get('/notes', [NoteController::class, 'index']);
 
-Route::get('/note/{id}', [NoteController::class,'getNote']);
+Route::get('/notes/{id}', [NoteController::class,'getNote']);
 
 Route::post('/notes', [NoteController::class, 'store']);
 
-Route::delete('/note/{id}', [NoteController::class,'deleteNote']);
+Route::delete('/notes/{id}', [NoteController::class,'deleteNote']);
 
-Route::patch('/note/{id}', [NoteController::class,'updateNote']);
+Route::put('/notes/{id}', [NoteController::class,'updateNote']);
 
 Route::get("/category", [CategoryController::class,"index"]);
 
@@ -27,5 +27,4 @@ Route::post("/category", [CategoryController::class,"store"]);
 
 Route::delete("/category/{id}", [CategoryController::class,"delete"]);
 
-Route::post('/notes/{id}/categories', [NoteController::class, 'addCategory']);
-
+Route::put('/notes/{id}/category', [NoteController::class, 'addCategory']);

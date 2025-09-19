@@ -14,10 +14,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('notes', function (Blueprint $table) {
-            $table->id(); // primary key (id bigint auto_increment)
-            $table->string('title', 255); // título de la nota
-            $table->text('content'); // contenido de la nota
-            $table->timestamps(); // created_at y updated_at
+            $table->id(); 
+            $table->text('notes'); 
+            $table->boolean('archived')->default(true); 
+            $table->timestamps(); 
         });
     }
 

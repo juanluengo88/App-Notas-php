@@ -2,105 +2,128 @@
 namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use App\Models\Note; // o Nota si tu modelo se llama así
-
+use App\Models\Note;
 class NoteController extends Controller
 {
-    // Método para probar
-   
-    // Lista todas las notas
-    public function index()
+
+    public function index(Request $request)
     {
-        $notes = Note::all(); // trae todos los registros de la tabla notes
+        $archived_param = $request->query("archived");
+        $category_param = $request->query("category");
+
+        $notes = [];
+
+        if ($request->has("archived") && $request->has("category")) {
+            $notes = Note::with('categories')
+                ->where("archived", "=", $archived_param)
+                ->whereHas('categories', function ($query) use ($category_param) {
+                    $query->where("name", "=", $category_param);
+                })
+                ->get();
+        } elseif ($request->has("archived")) {
+            $notes = Note::where("archived", "=", $archived_param)->get();
+        } elseif ($request->has("category")) {
+            $notes = Note::with('categories')
+                ->where("archived", "=", $archived_param)
+                ->whereHas('categories', function ($query) use ($category_param) {
+                    $query->where("name", "=", $category_param);
+                })
+                ->get();
+
+        } else {
+            $notes = Note::with("categories")->get();
+        }
+
         return response()->json($notes);
     }
-    
-    public function getNote(string $id){
+
+    public function getNote(string $id)
+    {
         $note = Note::with('categories')->find($id);
+
         if (!$note) {
             return response()->json(['message' => 'Nota no encontrada'], 404);
         }
         return response()->json($note);
     }
 
-    // Crea una nueva nota
+
     public function store(Request $request)
     {
-        // Valida los datos
+
         $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
+            'notes' => 'required|string'
         ]);
 
-        // Crea la nota
         $note = Note::create($validatedData);
 
-        return response()->json($note, 201);
+        return response()->json($note->id, 201);
     }
 
-    public function deleteNote(string $id){
-        $note = Note::find( $id );
+    public function deleteNote(string $id)
+    {
+        $note = Note::find($id);
         if (!$note) {
-            return response()->json(['message'=> ''],404);
+            return response()->json(['message' => ''], 404);
         }
         $note->delete();
-        return response()->json($note,204);
+        return response()->json($note, 204);
     }
     public function updateNote(Request $request, string $id)
-{
-    // 1. Validation: Use request validation to check the data.
-    $validatedData = $request->validate([
-        'title' => 'sometimes|string|max:255',
-        'content' => 'sometimes|string',
-    ]);
+    {
 
-    // 2. Find the note: Check if the note exists.
-    $note = Note::find($id);
+        $validatedData = $request->validate([
+            'notes' => 'sometimes|string',
+            "active" => 'sometimes|boolean'
+        ]);
 
-    // 3. Handle 'Not Found': If the note doesn't exist, return a 404 error.
-    if (!$note) {
-        return response()->json(['message' => 'Note not found'], 404);
+
+        $note = Note::find($id);
+
+
+        if (!$note) {
+            return response()->json(['message' => 'Note not found'], 404);
+        }
+
+
+        $note->update($validatedData);
+
+
+        return response()->json($note, 200);
     }
 
-    // 4. Update the note: Update the note with the validated data.
-    $note->update($validatedData);
-
-    // 5. Return a response: Return the updated note with a 200 OK status.
-    return response()->json($note, 200);
-}
-
-   public function addCategory(Request $request, $id)
+    public function addCategory(Request $request, $id)
     {
 
         $note = Note::find($id);
-        if($note==null) {
-            return response()->json(['message'=> 'The note doesnt exists'],404);
+        if ($note == null) {
+            return response()->json(['message' => 'The note doesnt exists'], 404);
         }
 
         $request->validate([
-            'category_id' => 'required|exists:categories,id',
+            'id' => 'required|exists:categories,id',
         ]);
-        $category = Category::find($request->category_id);
-        if(!$category) {
-            return response()->json(['message'=> 'That category doesnt exists'],404);
+        $category = Category::find($request->id);
+        if (!$category) {
+            return response()->json(['message' => 'That category doesnt exists'], 404);
         }
-        
 
 
-        $note->categories()->attach($request->category_id);
 
-        // Devolver una respuesta exitosa
+        $note->categories()->attach($request->id);
+
+
         return response()->json([
             'message' => 'Category sucessfully attached to the Note',
         ], 200);
-        
+
     }
     public function removeCategory(Note $note, Category $category)
     {
         $note->categories()->detach($category->id);
 
         return response()->json([
-            'message' => 'Categoría removida exitosamente de la nota.',
+            'message' => 'Category sucessfully deattached from the note',
         ], 200);
     }
 

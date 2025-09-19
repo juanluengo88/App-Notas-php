@@ -9,7 +9,7 @@ class Note extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'content', 'category'];
+    protected $fillable = ["archived", "notes" ,'category',];
     
 
     public function categories()
