@@ -41,7 +41,7 @@ const Note = ({
 	};
 
 	const archiveNote = async (id) => {
-		await axios.put(`${backend}/notes/${id}`, { active: +!note.active });
+		await axios.put(`${backend}/notes/${id}`, { archived: +!note.archived });
 		fetchNotes(`?archived=${+!menuArchivedFilter}`);
 	};
 

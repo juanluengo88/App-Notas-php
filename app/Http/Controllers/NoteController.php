@@ -7,35 +7,26 @@ class NoteController extends Controller
 {
 
     public function index(Request $request)
-    {
-        $archived_param = $request->query("archived");
-        $category_param = $request->query("category");
+{
+    $archived_param = $request->query("archived", 1); 
+    $category_param = $request->query("category");
 
-        $notes = [];
+    $query = Note::with("categories");
 
-        if ($request->has("archived") && $request->has("category")) {
-            $notes = Note::with('categories')
-                ->where("archived", "=", $archived_param)
-                ->whereHas('categories', function ($query) use ($category_param) {
-                    $query->where("name", "=", $category_param);
-                })
-                ->get();
-        } elseif ($request->has("archived")) {
-            $notes = Note::where("archived", "=", $archived_param)->get();
-        } elseif ($request->has("category")) {
-            $notes = Note::with('categories')
-                ->where("archived", "=", $archived_param)
-                ->whereHas('categories', function ($query) use ($category_param) {
-                    $query->where("name", "=", $category_param);
-                })
-                ->get();
+    
+    $query->where("archived", "=", $archived_param);
 
-        } else {
-            $notes = Note::with("categories")->get();
-        }
-
-        return response()->json($notes);
+    if ($category_param) {
+        $query->whereHas("categories", function ($q) use ($category_param) {
+            $q->where("name", "=", $category_param);
+        });
     }
+
+    $notes = $query->get();
+
+    return response()->json($notes);
+}
+
 
     public function getNote(string $id)
     {
@@ -74,7 +65,7 @@ class NoteController extends Controller
 
         $validatedData = $request->validate([
             'notes' => 'sometimes|string',
-            "active" => 'sometimes|boolean'
+            "archived" => 'sometimes|boolean'
         ]);
 
 
