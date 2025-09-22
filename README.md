@@ -11,7 +11,7 @@ Antes de comenzar asegúrate de tener instalado:
 - [XAMPP](https://www.apachefriends.org/es/index.html) con **Apache** y **MySQL** en ejecución  
 - [Composer](https://getcomposer.org/) para manejar dependencias de PHP  
 - [Node.js](https://nodejs.org/) y **npm** para manejar dependencias del frontend  
-- [Mysql] (https://www.mysql.com) para que se cree el schema
+- [Mysql](https://www.mysql.com/) para que se cree el schema
 ---
 
 -   Aclaracion, al XAMPP hay que cambiarle el puerto de la base de datos al 8001 en el apartado de config my ini
