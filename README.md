@@ -14,6 +14,8 @@ Antes de comenzar asegúrate de tener instalado:
 - [Mysql] (https://www.mysql.com) para que se cree el schema
 ---
 
+-   Aclaracion, al XAMPP hay que cambiarle el puerto de la base de datos al 8001 en el apartado de config my ini
+  
 ## ⚙️ Instalación y configuración  
 
 1. Clonar este repositorio  
